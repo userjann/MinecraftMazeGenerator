@@ -1,6 +1,6 @@
 # maze plugin
 
-creates a maze with the command /maze <length>.
+creates a maze with the command /maze length.
 
 If the length is empty then the maze will be 30x30.
 
