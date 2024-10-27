@@ -1,0 +1,7 @@
+name: Labyrinth
+version: '${project.version}'
+main: ch.mc.jr.labyrinth.Labyrinth
+api-version: '1.20'
+commands:
+  maze:
+    usage: /maze
