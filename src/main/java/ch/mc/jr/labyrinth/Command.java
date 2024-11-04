@@ -7,7 +7,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
-
 import java.util.*;
 
 
@@ -36,6 +35,15 @@ public class Command implements CommandExecutor {
         Player player = (Player) sender;
         if(command.getName().equalsIgnoreCase("maze")){
             int length;
+            String version = "v1";
+
+            if (args.length > 1) {
+                version = args[1];
+                if (!version.equalsIgnoreCase("v1") && !version.equalsIgnoreCase("v2")) {
+                    player.sendMessage("v1 oder v2 angeben");
+                    return false;
+                }
+            }
             if (args.length == 0) {
                 length = 30;
             }else{
@@ -53,7 +61,7 @@ public class Command implements CommandExecutor {
 
 
             block(player.getLocation(), Material.STONE, length);
-            path(player.getLocation(),length);
+            path(player.getLocation(),length, version );
             player.teleport(middle(player.getLocation(),length));
 
             return true;
@@ -87,7 +95,7 @@ public class Command implements CommandExecutor {
         }
     }
 
-    private void path(Location start, int length){
+    private void path(Location start, int length, String version){
         Location loc = middle(start, length);
         XZCords direction = getBuildDirection(start);
         locationMap.put(new XZCords(loc),loc);
@@ -96,12 +104,26 @@ public class Command implements CommandExecutor {
         while (!locationMap.isEmpty()){
             for(Vector vec : allVectors){
                 Location candidate = loc.clone().add(vec);
-                if(!isAir(candidate)){
-                    Location forward = candidate.clone().add(vec);
-                    Location right = candidate.clone().add(rotate90Degrees(vec));
-                    Location left = candidate.clone().add(rotate270Degrees(vec));
-                    if(!isAir(forward) && !isAir(right) && !isAir(left)){
-                        alloptions.add(candidate);
+                if (version.equalsIgnoreCase("v2")){
+                    Bukkit.broadcastMessage("v2");
+                    if(!isAir(candidate)){
+                        Location forward = candidate.clone().add(vec);
+                        Location right = candidate.clone().add(rotate90Degrees(vec));
+                        Location left = candidate.clone().add(rotate270Degrees(vec));
+                        Location forwardLeft = forward.clone().add(rotate270Degrees(vec));
+                        Location forwardRight = forward.clone().add(rotate90Degrees(vec));
+                        if(!isAir(forward) && !isAir(right) && !isAir(left) && !isAir(forwardLeft) && !isAir(forwardRight)){
+                            alloptions.add(candidate);
+                        }
+                    }
+                }else{
+                    if(!isAir(candidate)){
+                        Location forward = candidate.clone().add(vec);
+                        Location right = candidate.clone().add(rotate90Degrees(vec));
+                        Location left = candidate.clone().add(rotate270Degrees(vec));
+                        if(!isAir(forward) && !isAir(right) && !isAir(left)){
+                            alloptions.add(candidate);
+                        }
                     }
                 }
             }
